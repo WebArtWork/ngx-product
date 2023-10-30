@@ -143,7 +143,20 @@ export class ProductsComponent {
 					}
 				]
 			});
-		}
+		},
+		buttons: [
+			{
+				icon: 'cloud_download',
+				click: (doc: Product) => {
+					this._form
+						.modalUnique<Product>(
+							'product',
+							'url',
+							doc
+						);
+				}
+			}
+		]
 	};
 
 	get rows(): Product[] {
