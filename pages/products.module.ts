@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CoreModule } from 'src/app/core';
 import { ProductsComponent } from './products.component';
 import { Routes, RouterModule } from '@angular/router';
+import { ProductsTemplateComponent } from './products/products-template/products-template.component';
 
 const routes: Routes = [{
 	path: '',
@@ -14,7 +15,8 @@ const routes: Routes = [{
 		CoreModule
 	],
 	declarations: [
-		ProductsComponent
+		ProductsComponent,
+  ProductsTemplateComponent
 	],
 	providers: []
 

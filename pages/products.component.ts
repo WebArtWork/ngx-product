@@ -1,10 +1,17 @@
 import { Component } from '@angular/core';
-import {FormService} from 'src/app/modules/form/form.service';
-import { ProductService, Product } from "src/app/modules/product/services/product.service";
-import { AlertService, CoreService } from 'wacom';
+import { FormService } from 'src/app/modules/form/form.service';
+import {
+	ProductService,
+	Product
+} from 'src/app/modules/product/services/product.service';
+import { AlertService, CoreService, HttpService } from 'wacom';
 import { TranslateService } from 'src/app/modules/translate/translate.service';
 import { FormInterface } from 'src/app/modules/form/interfaces/form.interface';
 import { TagService } from 'src/app/modules/tag/services/tag.service';
+import { ModalService } from 'src/app/modules/modal/modal.service';
+
+import { Router } from '@angular/router';
+import { ProductsTemplateComponent } from './products/products-template/products-template.component';
 
 @Component({
 	templateUrl: './products.component.html',
@@ -112,55 +119,92 @@ export class ProductsComponent {
 	});
 
 	config = {
-		create: () => {
-			this._form
-				.modal<Product>(this.form, {
-					label: 'Create',
-					click: (created: unknown, close: () => void) => {
-						this._ps.create(created as Product);
-						close();
-					}
-				});
-		},
-		update: (doc: Product) => {
-			this._form.modal<Product>(this.form, [], doc).then((updated: Product) => {
-				this._core.copy(updated, doc);
-				this._ps.save(doc);
-			});
-		},
-		delete: (doc: Product) => {
-			this._alert.question({
-				text: this._translate.translate('Common.Are you sure you want to delete this product?'),
-				buttons: [
-					{
-						text: this._translate.translate('Common.No')
-					},
-					{
-						text: this._translate.translate('Common.Yes'),
-						callback: () => {
-							this._ps.delete(doc);
+		create:
+			this._router.url === '/craftsman/craftlinks'
+				? null
+				: () => {
+						this._form.modal<Product>(this.form, {
+							label: 'Create',
+							click: (created: unknown, close: () => void) => {
+								(created as Product).isTemplate =
+									this._router.url === '/craftsman/crafts'
+										? true
+										: false;
+								this._ps.create(created as Product);
+								close();
+							}
+						});
+				  },
+		update:
+			this._router.url === '/craftsman/craftlinks'
+				? null
+				: (doc: Product) => {
+						this._form
+							.modal<Product>(this.form, [], doc)
+							.then((updated: Product) => {
+								this._core.copy(updated, doc);
+								this._ps.save(doc);
+							});
+				  },
+		delete:
+			this._router.url === '/craftsman/craftlinks'
+				? null
+				: (doc: Product) => {
+						this._alert.question({
+							text: this._translate.translate(
+								'Common.Are you sure you want to delete this product?'
+							),
+							buttons: [
+								{
+									text: this._translate.translate('Common.No')
+								},
+								{
+									text: this._translate.translate(
+										'Common.Yes'
+									),
+									callback: () => {
+										this._ps.delete(doc);
+									}
+								}
+							]
+						});
+				  },
+		buttons:
+			this._router.url === '/craftsman/craftlinks'
+				? null
+				: [
+						{
+							icon: 'cloud_download',
+							click: (doc: Product) => {
+								this._form.modalUnique<Product>(
+									'product',
+									'url',
+									doc
+								);
+							}
 						}
-					}
-				]
-			});
-		},
-		buttons: [
+				  ],
+		headerButtons: [
 			{
-				icon: 'cloud_download',
-				click: (doc: Product) => {
-					this._form
-						.modalUnique<Product>(
-							'product',
-							'url',
-							doc
-						);
+				text: 'Add from crafts',
+				click: () => {
+					this._modal.show({
+						component: ProductsTemplateComponent,
+						class: 'forms_modal'
+					});
 				}
 			}
 		]
 	};
 
+	links: Product[] = [];
+
 	get rows(): Product[] {
-		return this._ps.products;
+		return this._router.url === '/craftsman/crafts'
+			? this._ps._products.isTemplate
+			: this._router.url === '/craftsman/craftlinks'
+			? this.links
+			: this._ps._products.isNotTemplate;
 	}
 
 	constructor(
@@ -169,6 +213,15 @@ export class ProductsComponent {
 		private _ps: ProductService,
 		private _form: FormService,
 		private _core: CoreService,
-		private _ts: TagService
-	) {}
+		private _modal: ModalService,
+		private _http: HttpService,
+		private _ts: TagService,
+		private _router: Router,
+	) {
+		if (this._router.url === '/craftsman/craftlinks') {
+			this._http.get('/api/product/getlinks', (links: Product[]) => {
+				links.forEach((product: Product)=>this.links.push(product));
+			});
+		}
+	}
 }
