@@ -197,14 +197,26 @@ export class ProductsComponent {
 		]
 	};
 
-	links: Product[] = [];
+	products: Product[] = [];
 
 	get rows(): Product[] {
 		return this._router.url === '/craftsman/crafts'
 			? this._ps._products.isTemplate
-			: this._router.url === '/craftsman/craftlinks'
-			? this.links
+			: this._router.url === '/craftsman/craftlinks' ||
+			  this._router.url === '/admin/products'
+			? this.products
 			: this._ps._products.isNotTemplate;
+	}
+	get title(): string {
+		if (this._router.url === '/craftsman/crafts') {
+			return 'Crafts'
+		}
+
+		if (this._router.url === '/craftsman/craftlinks') {
+			return 'Product Links'
+		}
+
+		return 'Products';
 	}
 
 	constructor(
@@ -220,7 +232,11 @@ export class ProductsComponent {
 	) {
 		if (this._router.url === '/craftsman/craftlinks') {
 			this._http.get('/api/product/getlinks', (links: Product[]) => {
-				links.forEach((product: Product)=>this.links.push(product));
+				links.forEach((product: Product)=>this.products.push(product));
+			});
+		} else if (this._router.url === '/admin/products') {
+			this._http.get('/api/product/getadmin', (links: Product[]) => {
+				links.forEach((product: Product)=>this.products.push(product));
 			});
 		}
 	}
