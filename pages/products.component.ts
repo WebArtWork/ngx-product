@@ -184,7 +184,10 @@ export class ProductsComponent {
 							}
 						}
 				  ],
-		headerButtons: [
+		headerButtons:
+		this._router.url === '/manage/products'
+		? null
+		: [
 			{
 				text: 'Add from crafts',
 				click: () => {
