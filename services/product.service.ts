@@ -4,6 +4,8 @@ import { MongoService, AlertService } from 'wacom';
 export interface Product {
 	_id?: string;
 	name: string;
+	tag: string;
+	tags: string[];
 	description: string;
 	isTemplate: boolean;
 	template: string;
@@ -14,6 +16,7 @@ export interface Product {
 })
 export class ProductService {
 	products: Product[] = [];
+	byTag: Record<string, Product[]> = {};
 
 	_products: any = {};
 
@@ -21,18 +24,21 @@ export class ProductService {
 		return {} as Product;
 	}
 
-	constructor(
-		private mongo: MongoService,
-		private alert: AlertService
-	) {
-		this.products = mongo.get('product', {
-			query: {
-				isTemplate: (doc: Product) => doc.isTemplate,
-				isNotTemplate: (doc: Product) => !doc.isTemplate
+	constructor(private mongo: MongoService, private alert: AlertService) {
+		this.products = mongo.get(
+			'product',
+			{
+				groups: 'tag',
+				query: {
+					isTemplate: (doc: Product) => doc.isTemplate,
+					isNotTemplate: (doc: Product) => !doc.isTemplate
+				}
+			},
+			(arr: any, obj: any) => {
+				this._products = obj;
+				this.byTag = obj.tag;
 			}
-		}, (arr: any, obj: any) => {
-			this._products = obj;
-		});
+		);
 	}
 
 	create(
@@ -44,14 +50,18 @@ export class ProductService {
 			this.save(product);
 		} else {
 			this.mongo.create('product', product, (created: Product) => {
-				callback(created);
-				this.alert.show({ text });
+				if (typeof callback === 'function') {
+					callback(created);
+				}
+				if (text) {
+					this.alert.show({ text });
+				}
 			});
 		}
 	}
 
 	doc(productId: string): Product {
-		if(!this._products[productId]){
+		if (!this._products[productId]) {
 			this._products[productId] = this.mongo.fetch('product', {
 				query: {
 					_id: productId
@@ -63,31 +73,37 @@ export class ProductService {
 
 	update(
 		product: Product,
-		callback = (created: Product) => {},
+		callback = () => {},
 		text = 'product has been updated.'
 	): void {
-		this.mongo.afterWhile(product, ()=> {
+		this.mongo.afterWhile(product, () => {
 			this.save(product, callback, text);
 		});
 	}
 
 	save(
 		product: Product,
-		callback = (created: Product) => {},
+		callback = () => {},
 		text = 'product has been updated.'
 	): void {
 		this.mongo.update('product', product, () => {
-			if(text) this.alert.show({ text, unique: product });
+			if (typeof callback === 'function') {
+				callback();
+			}
+			if (text) this.alert.show({ text, unique: product });
 		});
 	}
 
 	delete(
 		product: Product,
-		callback = (created: Product) => {},
+		callback = () => {},
 		text = 'product has been deleted.'
 	): void {
 		this.mongo.delete('product', product, () => {
-			if(text) this.alert.show({ text });
+			if (typeof callback === 'function') {
+				callback();
+			}
+			if (text) this.alert.show({ text });
 		});
 	}
 }
