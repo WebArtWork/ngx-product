@@ -15,7 +15,7 @@ export class ProductsCreateComponent {
 	create() {
 		const entities = JSON.parse(this.entities);
 		for (const entity of entities) {
-			entity.tag = this.tag;
+			entity.tags = this.tag ? [this.tag] : [];
 			this._ps.create(entity);
 		}
 	}

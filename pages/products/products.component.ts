@@ -247,8 +247,6 @@ export class ProductsComponent {
 				this.products.push(product);
 			}
 		}
-		console.log(this.tag, this.products);
-
 	}
 	get title(): string {
 		if (this._router.url === '/craftsman/crafts') {
