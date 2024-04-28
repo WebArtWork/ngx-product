@@ -146,9 +146,6 @@ export class ProductsComponent {
 						this._form.modal<Product>(this.form, {
 							label: 'Create',
 							click: (created: unknown, close: () => void) => {
-								if (this.tag) {
-									(created as Product).tag = this.tag;
-								}
 								(created as Product).isTemplate =
 									this._router.url === '/craftsman/crafts'
 										? true
@@ -159,7 +156,7 @@ export class ProductsComponent {
 								);
 								close();
 							}
-						});
+						}, this.tag ? { tags: [this.tag] } : {});
 				  },
 		update:
 			this._router.url === '/craftsman/craftlinks'
@@ -189,7 +186,10 @@ export class ProductsComponent {
 										'Common.Yes'
 									),
 									callback: () => {
-										this._ps.delete(doc, this.setProducts.bind(this));
+										this._ps.delete(
+											doc,
+											this.setProducts.bind(this)
+										);
 									}
 								}
 							]
