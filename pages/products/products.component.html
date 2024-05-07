@@ -34,4 +34,7 @@
 			type="checkbox"
 		></winput>
 	</ng-template>
+	<ng-template cell="thumb" let-element>
+		<img *ngIf="element.thumb" [src]="element.thumb" [alt]="element.name" style="height: 50px;">
+	</ng-template>
 </wtable>

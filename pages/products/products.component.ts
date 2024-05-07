@@ -30,8 +30,9 @@ import {
 	styleUrls: ['./products.component.scss']
 })
 export class ProductsComponent {
-	columns = ['enabled', 'top', 'name', 'price'];
+	columns = ['enabled', 'top', 'thumb', 'name', 'price'];
 
+	tags: Tag[] = [];
 	form: FormInterface = this._form.getForm('product', {
 		formId: 'product',
 		title: 'Product',
@@ -131,7 +132,8 @@ export class ProductsComponent {
 					},
 					{
 						name: 'Items',
-						value: this._ts.tags
+						// value: this._ts.tags
+						value: this.tags
 					}
 				]
 			}
@@ -264,7 +266,6 @@ export class ProductsComponent {
 		this._ps.update(product);
 	}
 
-	tags: Tag[] = [];
 	tagIncludeStore(tag: Tag) {
 		if (tag.stores.includes(this.store)) return true;
 		while (tag.parent) {
@@ -274,7 +275,7 @@ export class ProductsComponent {
 		return false;
 	}
 	setTags() {
-		this.tags = [];
+		this.tags.splice(0, this.tags.length);
 		for (const tag of this._ts.tags) {
 			tag.stores = tag.stores || [];
 			if (!this.store || this.tagIncludeStore(tag)) {
