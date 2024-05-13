@@ -115,20 +115,6 @@ export class ProductsComponent {
 				]
 			},
 			{
-				name: 'Text',
-				key: 'weight',
-				fields: [
-					{
-						name: 'Placeholder',
-						value: 'fill product weight'
-					},
-					{
-						name: 'Label',
-						value: 'Weight'
-					}
-				]
-			},
-			{
 				name: 'Select',
 				key: 'tags',
 				fields: [
