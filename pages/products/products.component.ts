@@ -19,11 +19,11 @@ import { ModalService } from 'src/app/modules/modal/modal.service';
 import { Router } from '@angular/router';
 import { ProductsTemplateComponent } from './products-template/products-template.component';
 import { ProductsCreateComponent } from './products-create/products-create.component';
-import { UserService } from 'src/app/core';
 import {
 	Store,
 	StoreService
 } from 'src/app/modules/store/services/store.service';
+import { UserService } from 'src/app/modules/user/services/user.service';
 
 @Component({
 	templateUrl: './products.component.html',
