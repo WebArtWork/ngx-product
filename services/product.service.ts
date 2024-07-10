@@ -9,6 +9,7 @@ export interface Product {
 	description: string;
 	isTemplate: boolean;
 	template: string;
+	price: number;
 }
 
 @Injectable({
