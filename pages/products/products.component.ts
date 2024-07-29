@@ -31,7 +31,6 @@ import { UserService } from 'src/app/modules/user/services/user.service';
 })
 export class ProductsComponent {
 	columns = ['enabled', 'top', 'thumb', 'name', 'price'];
-	gender: string[] = ['boy', 'girl'];
 
 	tags: Tag[] = [];
 	form: FormInterface = this._form.getForm('product', {
@@ -117,42 +116,6 @@ export class ProductsComponent {
 			},
 			{
 				name: 'Select',
-				key: 'gender',
-				fields: [
-					{
-						name: 'Placeholder',
-						value: 'fill product gender'
-					},
-					{
-						name: 'Label',
-						value: 'Gender'
-					},
-					{
-						name: 'Multiple',
-						value: true
-					},
-					{
-						name: 'Items',
-						value: this.gender
-					}
-				]
-			},
-			{
-				name: 'Text',
-				key: 'season',
-				fields: [
-					{
-						name: 'Placeholder',
-						value: 'fill product season'
-					},
-					{
-						name: 'Label',
-						value: 'Season'
-					}
-				]
-			},
-			{
-				name: 'Select',
 				key: 'tags',
 				fields: [
 					{
@@ -182,84 +145,84 @@ export class ProductsComponent {
 			this._router.url === '/craftsman/craftlinks'
 				? null
 				: () => {
-					this._form.modal<Product>(this.form, {
-						label: 'Create',
-						click: (created: unknown, close: () => void) => {
-							(created as Product).isTemplate =
-								this._router.url === '/craftsman/crafts'
-									? true
-									: false;
-							this._ps.create(
-								created as Product,
-								this.setProducts.bind(this)
-							);
-							close();
-						}
-					}, this.tag ? { tags: [this.tag] } : {});
-				},
+						this._form.modal<Product>(this.form, {
+							label: 'Create',
+							click: (created: unknown, close: () => void) => {
+								(created as Product).isTemplate =
+									this._router.url === '/craftsman/crafts'
+										? true
+										: false;
+								this._ps.create(
+									created as Product,
+									this.setProducts.bind(this)
+								);
+								close();
+							}
+						}, this.tag ? { tags: [this.tag] } : {});
+				  },
 		update:
 			this._router.url === '/craftsman/craftlinks'
 				? null
 				: (doc: Product) => {
-					this._form
-						.modal<Product>(this.form, [], doc)
-						.then((updated: Product) => {
-							this._core.copy(updated, doc);
-							this._ps.save(doc);
-						});
-				},
+						this._form
+							.modal<Product>(this.form, [], doc)
+							.then((updated: Product) => {
+								this._core.copy(updated, doc);
+								this._ps.save(doc);
+							});
+				  },
 		delete:
 			this._router.url === '/craftsman/craftlinks'
 				? null
 				: (doc: Product) => {
-					this._alert.question({
-						text: this._translate.translate(
-							'Common.Are you sure you want to delete this product?'
-						),
-						buttons: [
-							{
-								text: this._translate.translate('Common.No')
-							},
-							{
-								text: this._translate.translate(
-									'Common.Yes'
-								),
-								callback: () => {
-									this._ps.delete(
-										doc,
-										this.setProducts.bind(this)
-									);
+						this._alert.question({
+							text: this._translate.translate(
+								'Common.Are you sure you want to delete this product?'
+							),
+							buttons: [
+								{
+									text: this._translate.translate('Common.No')
+								},
+								{
+									text: this._translate.translate(
+										'Common.Yes'
+									),
+									callback: () => {
+										this._ps.delete(
+											doc,
+											this.setProducts.bind(this)
+										);
+									}
 								}
-							}
-						]
-					});
-				},
+							]
+						});
+				  },
 		buttons:
 			this._router.url === '/craftsman/craftlinks'
 				? null
 				: [
-					{
-						icon: 'cloud_download',
-						click: (doc: Product) => {
-							this._form.modalUnique<Product>(
-								'product',
-								'url',
-								doc
-							);
+						{
+							icon: 'cloud_download',
+							click: (doc: Product) => {
+								this._form.modalUnique<Product>(
+									'product',
+									'url',
+									doc
+								);
+							}
 						}
-					}
-				],
+				  ],
 		headerButtons: [
 			this._us.role('admin') || this._us.role('agent')
 				? {
-					icon: 'add_circle',
-					click: () => {
-						this._modal.show({
-							component: ProductsCreateComponent,
-							tag: this.tag
-						});
-					}
-				}
+						icon: 'add_circle',
+						click: () => {
+							this._modal.show({
+								component: ProductsCreateComponent,
+								tag: this.tag
+							});
+						}
+				  }
 				: null
 			// {
 			// 	text: 'Add from crafts',
